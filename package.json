@@ -82,6 +82,8 @@
       "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.26.tgz",
       "version": "2.1.26"
     },
+    "msql": "^1.0.3",
+    "mysql": "^2.18.1",
     "needle": "^2.4.1",
     "node": {
       "integrity": "sha512-y59XTAeL1CYS645Bm6HFgNpp1NwFd/jTKP0q7j7z0EA0bDwieRNRNKdccvuHLDCMpxXti+r7Yu7Lxn2e/mUaIw==",

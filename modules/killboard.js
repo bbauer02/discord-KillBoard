@@ -2,6 +2,15 @@
 const Jimp      = require('jimp');
 const coords    = require('./coords');
 const fs = require("fs");
+const mysql = require('mysql');
+const config = require('../config.json');
+const db =  mysql.createConnection({
+    host: config.MYSQL_HOST,
+    port: config.MYSQL_PORT,
+    user: config.MYSQL_USER,
+    password: config.MYSQL_PASSWORD,
+    database: config.MYSQL_DATABASE
+});
 
 class killboard {
 // On initialise l'objet 'KillBoard'
@@ -261,9 +270,11 @@ class killboard {
                 return filePath;
             }
         }
-        catch (err)
+        catch (err )
         {
-            throw "*****************Erreur dans la fonction getItemPath() : \n " + err;
+            console.log("ERREUR : " + `${item.Type}_${item.Quality}.png`);
+            return this.getItemPath(item);
+            //throw "*****************Erreur dans la fonction getItemPath() : \n " + err;
         }
     }
 // Format les chiffres trop long.
@@ -298,7 +309,58 @@ class killboard {
 
 
 }
-
+/********
+ * La fonction 'filtre' renvoie true  
+ * si les conditions sont remplies et permet de filtrer la liste des evénements en ne gardant que les alliances passées en paramètre. * 
+ */
+const getGuildSubscribers = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT id,channelid,guildName, isactive FROM killbot_guilds WHERE isactive = 1`;
+        db.query(sql, (err, resp) => {
+            if(err) {
+                reject(err);
+            }
+            else {
+                const table = [];
+                resp.forEach(element => {
+                    let obj = {
+                            'guildName' : element.guildName,
+                            'channelid' : element.channelid
+                        };  
+                    
+                    table.push(obj);
+                    
+                });
+                resolve(table);
+            }
+        });
+    });
+}
+const getAllianceSubscribers = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT id,channelid,allianceName, isactive FROM killbot_alliances  WHERE isactive = 1`;
+        db.query(sql, (err, resp) => {
+            if(err) {
+                reject(err);
+            }
+            else {
+                const table = [];
+                resp.forEach(element => {
+                    let obj = {
+                            'allianceName' : element.allianceName,
+                            'channelid' : element.channelid
+                        };  
+                    
+                    table.push(obj);
+                    
+                });
+                resolve(table);
+            }
+        });
+    });
+}
 module.exports = { 
-    killboard
+    killboard,
+    getGuildSubscribers,
+    getAllianceSubscribers
 }

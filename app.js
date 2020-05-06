@@ -7,18 +7,22 @@ const adapter = new FileSync('../LastKill.json');
 const db = low(adapter);
 const killBoardMessage = require('./modules/discordMessages');
 const killBoard = require('./modules/killboard.js');
-
-/*(async () => {
+/*
+(async () => {
 
     const events = await Albion.getEvents();
+
+    //console.log(events);
     events.map(async event => {
+        console.log("[" + event.Killer.AllianceName + "]"  + event.Killer.Name + " VS " +  "[" + event.Victim.AllianceName + "]"  + event.Victim.Name);
+       
         var kb = new killBoard.killboard();
         await kb.init(event);
         await kb.addInventory();
     });
 
-})();*/
-
+})();
+*/
 
 
 
@@ -30,6 +34,9 @@ if(!db.has('recents.eventId').value())
 }
 const client = new Discord.Client();
 client.on('ready', async () => {
+    console.log(`Serveur Killboard ${config.version} Start`);
+    const guildSubscribers = await killBoard.getGuildSubscribers(); 
+    const allianceSubscribers = await killBoard.getAllianceSubscribers();
   // Temp permet d'éviter d'afficher le status du serveur à chaque interval.
         let temp = 0;
         setInterval( async () => { 
@@ -41,11 +48,21 @@ client.on('ready', async () => {
                 {
                     if(temp !== serverStatus) 
                     {
-                        killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est en ligne !`,"#00ff06");
+                        //On affiche le status du serveur ALbion sur tout les Serveurs DIscord Inscrit
+                        guildSubscribers.forEach(guildSubscriber => {
+                            killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est en ligne !`,"#00ff06", guildSubscriber.channelid);
+                        });
+                        //On affiche le status du serveur ALbion sur tout les Serveurs DIscord Inscrit
+                        allianceSubscribers.forEach(allianceSubscriber => {
+                            killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est en ligne !`,"#00ff06", allianceSubscriber.channelid);
+                        });
+                                                
+                        
                         temp = serverStatus;
                     }
                     // On récupére l'ensemble des événements. 
-                    const events = await Albion.getEvents();
+                    const events = await Albion.getEvents(guildSubscribers,allianceSubscribers);
+                   // console.log(events[Object.keys(events).length-1])
                     if(Object.keys(events).length > 0)
                     {
                         // On récupére l'eventId du dernier élément de la liste.
@@ -83,36 +100,74 @@ client.on('ready', async () => {
                                     .attachFiles(files)
                                     .setImage('attachment://KillBoard.png')
                                     .setFooter(`KillBot en exclusivité pour les 'Black Bear" `);
-                                    client.channels.fetch(config.botChannel).then(channel => {
-                                        channel.send(messageKillBoard);
-                                        if(InventoryBuffer !== false)
+                                    // DISPATCH LES MESSAGES SUR LES DISCORDS CONCERNE
+                                    // Sur Discord des Alliances
+
+                                        let subscriberalliance = allianceSubscribers.filter(subscriber => subscriber.allianceName == event.Killer.AllianceName || subscriber.allianceName == event.Victim.AllianceName);
+                                        if(subscriberalliance.length > 0)
                                         {
-                                            files = [{ name: 'inventaire.png', attachment: InventoryBuffer }];
-                                            embed = {
-                                                url: `https://albiononline.com/en/killboard/kill/${event.EventId}`,
-                                                title: ` :gift: Inventaire de :  ${event.Victim.Name}! :gift: `,
-                                                color:  "#5b2d00",
-                                                image: { url: 'attachment://inventaire.png' },
-                                            };
-                                            channel.send({embed,files});
+                                            client.channels.fetch(subscriberalliance[0].channelid).then(channel => {
+                                                channel.send(messageKillBoard);
+                                                if(InventoryBuffer !== false)
+                                                {
+                                                    files = [{ name: 'inventaire.png', attachment: InventoryBuffer }];
+                                                    embed = {
+                                                        url: `https://albiononline.com/en/killboard/kill/${event.EventId}`,
+                                                        title: ` :gift: Inventaire de :  ${event.Victim.Name}! :gift: `,
+                                                        color:  "#5b2d00",
+                                                        image: { url: 'attachment://inventaire.png' },
+                                                    };
+                                                    channel.send({embed,files});
+                                                }
+                                            });
                                         }
-                                    });
+
+
+                                    // Sur Discord des Guildes
+                                        let subscriber = guildSubscribers.filter(subscriber => subscriber.guildName == event.Killer.GuildName || subscriber.guildName == event.Victim.GuildName);
+                                        if(subscriber.length > 0)
+                                        {
+                                            client.channels.fetch(subscriber[0].channelid).then(channel => {
+                                                channel.send(messageKillBoard);
+                                                if(InventoryBuffer !== false)
+                                                {
+                                                    files = [{ name: 'inventaire.png', attachment: InventoryBuffer }];
+                                                    embed = {
+                                                        url: `https://albiononline.com/en/killboard/kill/${event.EventId}`,
+                                                        title: ` :gift: Inventaire de :  ${event.Victim.Name}! :gift: `,
+                                                        color:  "#5b2d00",
+                                                        image: { url: 'attachment://inventaire.png' },
+                                                    };
+                                                    channel.send({embed,files});
+                                                }
+                                            });
+                                        }
+
 
                             });
                         }
 
                     }
+                    else {
+                        console.log("Aucun événement de filtré !");
+                    }
                 } // Si le serveur est Hors Ligne.
                 else if(serverStatus === false  && temp !== serverStatus) 
                 {
                     temp = serverStatus;
-                    killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est hors ligne !`,"ff0000");
+                    guildSubscribers.forEach(guildSubscriber => {
+                        killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est hors ligne !`,"ff0000", guildSubscriber.channelid);
+                    });
+                    allianceSubscribers.forEach(allianceSubscriber => {
+                        killBoardMessage.status(client,`Killbot version ${config.version}`, `Le serveur ALBION est hors ligne !`,"#ff0000", allianceSubscriber.channelid);
+                    });
+                   
                 }
             }
             catch(err) {
                 console.log(err);
             }
-        },50000);
+        },30000);
 
 
 });

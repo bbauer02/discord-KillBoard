@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const config = require('../config.json');
 
-const status = async (client, titre, message,couleur) => { 
+const status = async (client, titre, message,couleur, botChannel) => { 
     const messageEmbed = new Discord.MessageEmbed()
         .setColor(couleur)
         .setTitle(`:crossed_swords: ${titre}`)
@@ -9,7 +9,7 @@ const status = async (client, titre, message,couleur) => {
         .setDescription(message)   
         .setFooter(config.credit);
         
-        client.channels.fetch(config.botChannel).then(channel => {
+        client.channels.fetch(botChannel).then(channel => {
             channel.send(messageEmbed);
           });
 
