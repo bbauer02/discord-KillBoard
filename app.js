@@ -7,6 +7,8 @@ const adapter = new FileSync('./LastKill.json');
 const db = low(adapter);
 const killBoardMessage = require('./modules/discordMessages');
 const killBoard = require('./modules/killboard.js');
+const quote = require('./quotes.json');
+const nbrQuotes = quote.length;
 /*
 (async () => {
 
@@ -23,8 +25,6 @@ const killBoard = require('./modules/killboard.js');
 
 })();
 */
-
-
 
 
 
@@ -83,23 +83,34 @@ client.on('ready', async () => {
                                 let InventoryBuffer = imgBuffers[1];
 
                                 let files = [{ name: 'KillBoard.png', attachment: ReportBuffer }];
-                                let title = "";
-                                let color = "";
-                                if(event.Killer.GuildName == config.guildName) {
-                                    title = `:crossed_swords: ${event.Killer.Name} a tué ${event.Victim.Name}! `;
-                                    color = "#00ff06";
-                                }
-                                else {
-                                    title = `:poop:  ${event.Victim.Name} a été tué par ${event.Killer.Name} :cry:  `;
-                                    color = "#ff0000";
-                                }
+                                let title = `:poop:  ${event.Victim.Name} a été tué par ${event.Killer.Name} :cry:  `;
+                                let color = "#ff0000";
+
+                                guildSubscribers.forEach(guildSubscriber => {
+                                   if(event.Killer.GuildName == guildSubscriber.guildName ) 
+                                   {
+                                        title = `:crossed_swords: ${event.Killer.Name} a tué ${event.Victim.Name}! `;
+                                        color = "#00ff06";
+                                   }
+                                });
+                                allianceSubscribers.forEach(allianceSubscriber => {
+                                    if(event.Killer.AlliancedName == allianceSubscriber.allianceName ) 
+                                    {
+                                         title = `:crossed_swords: ${event.Killer.Name} a tué ${event.Victim.Name}! `;
+                                         color = "#00ff06";
+                                    }
+                                 });
+
+
+                                 const quoteNumber = Math.floor(Math.random() * nbrQuotes);
                                 const messageKillBoard = new Discord.MessageEmbed()
                                     .setURL(`https://albiononline.com/en/killboard/kill/${event.EventId}`)
+                                    .setDescription(quote[quoteNumber].quote + "\n" +"**" + quote[quoteNumber].autheur + "**")
                                     .setColor(color)
                                     .setTitle(title)
                                     .attachFiles(files)
                                     .setImage('attachment://KillBoard.png')
-                                    .setFooter(`KillBot en exclusivité pour les 'Black Bear" `);
+                                    .setFooter(`KillBot en exclusivité pour les 'Black Bear" et l'alliance 'OMBRE' `);
                                     // DISPATCH LES MESSAGES SUR LES DISCORDS CONCERNE
                                     // Sur Discord des Alliances
 
@@ -165,7 +176,14 @@ client.on('ready', async () => {
                 }
             }
             catch(err) {
-                console.log(err);
+                var currentdate = new Date(); 
+                var datetime = "[" + currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds() + "]";
+                console.log(datetime +"  " + err);
             }
         },30000);
 

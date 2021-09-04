@@ -24,7 +24,7 @@
       // Git repository to clone
       "repo" : "git@github.com:repo.git",
       // Path of the application on target servers
-      "path" : "/var/www/production",
+      "path" : "/var/www/html/discordbots/KillBoard2.0",
       // Can be used to give options in the format used in the configura-
       // tion file.  This is useful for specifying options for which there
       // is no separate command-line flag, see 'man ssh'

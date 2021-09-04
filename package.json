@@ -21,6 +21,7 @@
       "version": "0.4.0"
     },
     "axios": "^0.19.2",
+    "axios-cookiejar-support": "^1.0.0",
     "bent": "^7.1.2",
     "bytesish": {
       "integrity": "sha512-j3l5QmnAbpOfcN/Z2Jcv4poQYfefs8rDdcbc6iEKm+OolvUXAE2APodpWj+DOzqX6Bl5Ys1cQkcIV2/doGvQxg==",
@@ -61,6 +62,7 @@
       "resolved": "https://registry.npmjs.org/form-data/-/form-data-3.0.0.tgz",
       "version": "3.0.0"
     },
+    "got": "^11.5.2",
     "is-stream": {
       "integrity": "sha512-XCoy+WlUr7d1+Z8GgSuXmpuUFC9fOhRXglJMx+dwLKTkL44Cjd4W1Z5P+BQZpr+cR93aGP4S/s7Ftw6Nd/kiEw==",
       "resolved": "https://registry.npmjs.org/is-stream/-/is-stream-2.0.0.tgz",
@@ -82,6 +84,7 @@
       "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.26.tgz",
       "version": "2.1.26"
     },
+    "moment": "^2.27.0",
     "msql": "^1.0.3",
     "mysql": "^2.18.1",
     "needle": "^2.4.1",
@@ -113,11 +116,13 @@
       "resolved": "https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz",
       "version": "1.0.5"
     },
+    "tough-cookie": "^4.0.0",
     "tweetnacl": {
       "integrity": "sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==",
       "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz",
       "version": "1.0.3"
     },
+    "wikiquote": "^0.5.0",
     "ws": {
       "integrity": "sha512-HTDl9G9hbkNDk98naoR/cHDws7+EyYMOdL1BmjsZXRUjf7d+MficC4B7HLUPlSiho0vg+CWKrGIt/VJBd1xunQ==",
       "resolved": "https://registry.npmjs.org/ws/-/ws-7.2.3.tgz",

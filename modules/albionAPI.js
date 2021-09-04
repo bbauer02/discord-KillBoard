@@ -1,5 +1,6 @@
 const config = require('../config.json');
 const axios = require('axios');
+const got = require("got");
 /********
  * La fonction 'IsAlbionServeurOnline' renvoie "true" si le serveur est en ligne 
  * "false" si le serveur est hors ligne. 
@@ -7,13 +8,13 @@ const axios = require('axios');
 async function IsOnline() {
     try
     {
-        let stream = await axios.get('http://live.albiononline.com/status.txt');
+        let stream = await got('http://live.albiononline.com/status.txt').json();
         let jsonStatus = JSON.parse(stream.data.replace(/\n/g, ' ').replace(/\r/g, '').trim());
         if(jsonStatus.status == "online") {
             return true;
         } 
         else {
-            return false;
+            return true;
         }
     }
     catch(err) {
@@ -54,10 +55,10 @@ const getEvents = async (guildSubscribers, allianceSubscribers) => {
     try 
     {
         //On récupére les 52 événements donnés par l'API Albion Online.
-        const res = await axios.get('https://gameinfo.albiononline.com/api/gameinfo/events?limit=51&offset=0');
+        const res = await got.get('https://gameinfo.albiononline.com/api/gameinfo/events?limit=51&offset=0');
        // Sur ces 52 événements, on applique un filtre pour ne conserver que ceux en rapport
        // avec la guilde
-  
+        
         let events = res.data.filter(filter_by_alliance_guild(guildSubscribers,allianceSubscribers));
         console.log("Nombre d'événements filtré : " + Object.keys(events).length);
     // On tri les événements du plus ancien au plus récent ( via leur EventId)   
@@ -76,7 +77,7 @@ const getEvents = async (guildSubscribers, allianceSubscribers) => {
             return getEvents(guildSubscribers, allianceSubscribers);
         }
         else {
-            throw err;
+            throw "erreur de la fonction : GETEVENT de l'aPI " + err;
         }
     }
 };

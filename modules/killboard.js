@@ -4,13 +4,18 @@ const coords    = require('./coords');
 const fs = require("fs");
 const mysql = require('mysql');
 const config = require('../config.json');
-const db =  mysql.createConnection({
-    host: config.MYSQL_HOST,
-    port: config.MYSQL_PORT,
-    user: config.MYSQL_USER,
-    password: config.MYSQL_PASSWORD,
-    database: config.MYSQL_DATABASE
-});
+
+const db_config = {
+        connectionLimit : 2,
+        host: config.MYSQL_HOST,
+        port: config.MYSQL_PORT,
+        user: config.MYSQL_USER,
+        password: config.MYSQL_PASSWORD,
+        database: config.MYSQL_DATABASE
+  };
+  const pool  = mysql.createPool(db_config);
+
+
 
 class killboard {
 // On initialise l'objet 'KillBoard'
@@ -31,6 +36,7 @@ class killboard {
         
         
     }
+
 
 // Afficher un joueur aux coordonnées passées en paramêtres
     addName(playerName, coords) {
@@ -242,7 +248,7 @@ class killboard {
 // Générer l'URL des icones des équipements
     getItemUrl(item) {
         return item && [
-            'https://gameinfo.albiononline.com/api/gameinfo/items/',
+            'https://render.albiononline.com/v1/item/',
             `${item.Type}.png`,
             `?count=${item.Count}`,
             `&quality=${item.Quality}`,
@@ -313,10 +319,11 @@ class killboard {
  * La fonction 'filtre' renvoie true  
  * si les conditions sont remplies et permet de filtrer la liste des evénements en ne gardant que les alliances passées en paramètre. * 
  */
+
 const getGuildSubscribers = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT id,channelid,guildName, isactive FROM killbot_guilds WHERE isactive = 1`;
-        db.query(sql, (err, resp) => {
+        pool.query(sql, (err, resp) => {
             if(err) {
                 reject(err);
             }
@@ -339,7 +346,7 @@ const getGuildSubscribers = () => {
 const getAllianceSubscribers = () => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT id,channelid,allianceName, isactive FROM killbot_alliances  WHERE isactive = 1`;
-        db.query(sql, (err, resp) => {
+        pool.query(sql, (err, resp) => {
             if(err) {
                 reject(err);
             }
@@ -364,3 +371,5 @@ module.exports = {
     getGuildSubscribers,
     getAllianceSubscribers
 }
+
+
